@@ -196,25 +196,14 @@ class BookingController extends Controller
     {
         $data = $request->all();
 
-        if (isset($data['distance']) && $data['distance'] != "") {
-            $distance = $data['distance'];
-        } else {
-            $distance = "";
-        }
-        if (isset($data['time']) && $data['time'] != "") {
-            $time = $data['time'];
-        } else {
-            $time = "";
-        }
+        $distance = isset($data['distance']) ? $data['distance'] : "";
+        $time = isset($data['time']) ? $data['time'] : "";
+
         if (isset($data['jobid']) && $data['jobid'] != "") {
             $jobid = $data['jobid'];
         }
 
-        if (isset($data['session_time']) && $data['session_time'] != "") {
-            $session = $data['session_time'];
-        } else {
-            $session = "";
-        }
+        $session = isset($data['session_time']) ? $data['session_time'] : "";
 
         if ($data['flagged'] == 'true') {
             if($data['admincomment'] == '') return "Please, add comment";
@@ -222,24 +211,12 @@ class BookingController extends Controller
         } else {
             $flagged = 'no';
         }
-        
-        if ($data['manually_handled'] == 'true') {
-            $manually_handled = 'yes';
-        } else {
-            $manually_handled = 'no';
-        }
 
-        if ($data['by_admin'] == 'true') {
-            $by_admin = 'yes';
-        } else {
-            $by_admin = 'no';
-        }
+        $manually_handled = $data['manually_handled'] == 'true' ? 'yes' : 'no';
+        $by_admin = $data['by_admin'] == 'true' ? 'yes' : 'no';
 
-        if (isset($data['admincomment']) && $data['admincomment'] != "") {
-            $admincomment = $data['admincomment'];
-        } else {
-            $admincomment = "";
-        }
+        $admincomment = isset($data['admincomment']) ? $data['admincomment'] : "";
+
         if ($time || $distance) {
 
             $affectedRows = Distance::where('job_id', '=', $jobid)->update(array('distance' => $distance, 'time' => $time));
@@ -290,5 +267,14 @@ class BookingController extends Controller
             return response(['success' => $e->getMessage()]);
         }
     }
+
+    // I only reviewed the repository methods which are being used in controller, I prefer to do CRUD and data related process
+    // in repository methods while the email,push notifications and sms work should be done using generic helper functions.
+    // and for each entity there should separate repository to prevent too much mess up in repositories.
+    // here is too many queries, generic scopes should be created for complex queries in models or using Traits.
+    // Model should be used for each migration queries and relationships instead of using DB and joins.
+
+    // In my whole career there was only short term project in which reposiroty structure was used, I am aware of its flow
+    // and can use it, but not good as in using Active Record Pattern.
 
 }
